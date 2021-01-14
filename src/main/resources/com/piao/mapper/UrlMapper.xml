@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.piao.mapper.UrlMapper">
+    <resultMap id="url" type="com.piao.bean.Url">
+        <id column="id" property="id"/>
+        <result column="long_url" property="longUrl"/>
+        <result column="short_url" property="shortUrl"/>
+        <result column="create_time" property="createTime"/>
+        <result column="destroy_time" property="destroyTime"/>
+        <result column="click_count" property="clickCount"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!--添加短链接-->
+    <insert id="createShortUrl" parameterType="com.piao.bean.Url">
+        INSERT INTO url VALUES(#{id},#{longUrl},#{shortUrl},#{createTime},#{destroyTime},#{clickCount},#{status})
+    </insert>
+    <!--批量添加短链接-->
+    <insert id="createShortUrlList" parameterType="list">
+        INSERT INTO url VALUES
+        <foreach collection="list" item="url" separator=",">
+            (#{url.id},#{url.longUrl},#{url.shortUrl},#{url.createTime},#{url.destroyTime},#{url.clickCount},#{url.status})
+        </foreach>
+    </insert>
+    <!--获取短链接信息-->
+    <select id="getShortUrlData" resultMap="url">
+          SELECT * FROM url WHERE short_url = #{shortUrl}
+    </select>
+    <!--批量获取短链接信息-->
+    <select id="getShortUrlDataList" parameterType="list" resultMap="url">
+        SELECT * FROM url WHERE short_url IN (
+        <foreach collection="list" item="shortUrl" separator=",">
+            #{shortUrl}
+        </foreach>
+        )
+    </select>
+    <!--删除短链接-->
+    <delete id="deleteShortUrl">
+        DELETE FROM url WHERE id = #{id} OR short_url = #{shortUrl}
+    </delete>
+    <!--增加点击次数-->
+    <update id="addClickCount">
+        UPDATE url SET click_count = click_count + 1 WHERE id = #{id}
+    </update>
+</mapper>
